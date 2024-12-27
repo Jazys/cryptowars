@@ -1,0 +1,49 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .wheel {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 5px solid #333;
+    overflow: hidden;
+    transition: transform 3s ease-out;
+  }
+  
+  .segment {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background-color: gold;
+    color: black;
+    text-align: center;
+    line-height: 150px;
+    transform-origin: 100% 100%;
+  }
+  
+  .segment:nth-child(even) {
+    background-color: black;
+    color: white;
+  }
+  
+  /* Position each segment around the circle */
+  .segment:nth-child(1) { transform: rotate(0deg) translateX(50%); }
+  .segment:nth-child(2) { transform: rotate(36deg) translateX(50%); }
+  .segment:nth-child(3) { transform: rotate(72deg) translateX(50%); }
+  .segment:nth-child(4) { transform: rotate(108deg) translateX(50%); }
+  .segment:nth-child(5) { transform: rotate(144deg) translateX(50%); }
+  .segment:nth-child(6) { transform: rotate(180deg) translateX(50%); }
+  .segment:nth-child(7) { transform: rotate(216deg) translateX(50%); }
+  .segment:nth-child(8) { transform: rotate(252deg) translateX(50%); }
+  .segment:nth-child(9) { transform: rotate(288deg) translateX(50%); }
+  .segment:nth-child(10) { transform: rotate(324deg) translateX(50%); }
+  
+  .spin {
+    transition: transform 3s ease-out;
+  }
+  

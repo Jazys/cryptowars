@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    logging:
+      options:
+        max-size: '12m'
+        max-file: '5'
+      driver: json-file
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.crypto-wars.rule=Host(`crypto-wars.prod-n8n.omvpb.ovh`)
+      - traefik.http.routers.crypto-wars.entrypoints=websecure
+      - traefik.http.routers.crypto-wars.tls=true
+      - traefik.http.routers.crypto-wars.tls.certresolver=lets-encrypt
+      - traefik.http.services.crypto-wars.loadbalancer.server.port=3000
+    #ports:
+    #  - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=********
+      - RESEND_API_KEY=********
+    networks:
+      - hosting_web
+
+networks:
+  hosting_web:
+    external:
+      name: traefik-proxy
+
+  #volumes:
+    #  - ./app:/app
+    #  - /app/node_modules
