@@ -42,9 +42,10 @@ const allFlags = [
 ]
 
 // Adresse du destinataire des transactions
-const RECIPIENT_ADDRESS = "0x6F42DC1CFd6D9904084349066E4948129eAb175a" // Remplacez par l'adresse souhaitée
+const RECIPIENT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
 const TRANSACTION_AMOUNT = "0.1" // Montant en FTM
 
+console.log("RECIPIENT_ADDRESS", RECIPIENT_ADDRESS);
 interface GameProps {
   flagsPerCrypto?: number
 }

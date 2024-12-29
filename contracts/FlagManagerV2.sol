@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract FlagManager {
+contract FlagManagerV2 {
     bool private initialized;
     uint256[50] private __gap;
 
@@ -32,8 +32,8 @@ contract FlagManager {
     mapping(string => Flag[]) public cryptoFlags;
     mapping(string => uint256) public cryptoFlagCounts;
     mapping(string => mapping(address => uint256)) public userFlagCounts;
+    bool public gameEnded;
     Winner public winner;
-    uint256 public lastGameEndTime;
 
     mapping(string => uint256) private countryCounts;
     mapping(string => mapping(address => uint256)) private countryUserCounts;
@@ -54,7 +54,11 @@ contract FlagManager {
         initialized = true;
 
         admin = msg.sender;
-        assignmentPrice = 0.01 ether;        
+        assignmentPrice = 0.01 ether;
+        
+        cryptos.push(Crypto({name: "Bitcoin", flagCount: 10}));
+        cryptos.push(Crypto({name: "Ethereum", flagCount: 8}));
+        cryptos.push(Crypto({name: "Fantom", flagCount: 5}));
     }
 
     function addCrypto(string memory _name, uint256 _flagCount) external onlyAdmin {
@@ -140,35 +144,43 @@ contract FlagManager {
     }
 
     function endGame() external onlyAdmin {
+        require(!gameEnded, "Game already ended");
+        
+        bool hasAssignedFlags = false;
         string[3] memory cryptoNames = ["Bitcoin", "Ethereum", "Fantom"];
         
-        // Compter les drapeaux par pays et par utilisateur
+        // Vérifier qu'il y a au moins un drapeau assigné
+        for (uint i = 0; i < cryptoNames.length && !hasAssignedFlags; i++) {
+            Flag[] storage currentFlags = cryptoFlags[cryptoNames[i]];
+            for (uint j = 0; j < currentFlags.length && !hasAssignedFlags; j++) {
+                if (currentFlags[j].isAssigned) {
+                    hasAssignedFlags = true;
+                    break;
+                }
+            }
+        }
+        require(hasAssignedFlags, "No flags assigned yet");
+        
+        // Compter les drapeaux par pays
         for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
-            for (uint j = 0; j < flagCount; j++) {
-                Flag storage flag = flags[cryptoNames[i]][j];
-                if (flag.isAssigned) {
-                    string memory country = flag.countryCode;
-                    address user = flag.owner;
-                    countryCounts[country]++;
-                    countryUserCounts[country][user]++;
+            Flag[] storage currentFlags = cryptoFlags[cryptoNames[i]];
+            for (uint j = 0; j < currentFlags.length; j++) {
+                if (currentFlags[j].isAssigned) {
+                    countryCounts[currentFlags[j].countryCode]++;
+                    countryUserCounts[currentFlags[j].countryCode][currentFlags[j].owner]++;
                 }
             }
         }
 
-        // Trouver le pays gagnant et le joueur gagnant
+        // Trouver le pays gagnant
         uint256 maxFlags = 0;
-        string memory winningCountry = "";
-        address winnerAddress = address(0);
-        uint256 maxUserFlags = 0;
+        string memory winningCountry;
         
-        // D'abord trouver le pays avec le plus de drapeaux
         for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
-            for (uint j = 0; j < flagCount; j++) {
-                Flag storage flag = flags[cryptoNames[i]][j];
-                if (flag.isAssigned) {
-                    string memory country = flag.countryCode;
+            Flag[] storage currentFlags = cryptoFlags[cryptoNames[i]];
+            for (uint j = 0; j < currentFlags.length; j++) {
+                if (currentFlags[j].isAssigned) {
+                    string memory country = currentFlags[j].countryCode;
                     if (countryCounts[country] > maxFlags) {
                         maxFlags = countryCounts[country];
                         winningCountry = country;
@@ -177,21 +189,19 @@ contract FlagManager {
             }
         }
 
-        // Si on a trouvé un pays gagnant, trouver le joueur avec le plus de drapeaux dans ce pays
-        if (maxFlags > 0) {
-            // Parcourir tous les drapeaux pour trouver le joueur avec le plus de drapeaux dans le pays gagnant
-            for (uint i = 0; i < cryptoNames.length; i++) {
-                uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
-                for (uint j = 0; j < flagCount; j++) {
-                    Flag storage flag = flags[cryptoNames[i]][j];
-                    if (flag.isAssigned && 
-                        keccak256(bytes(flag.countryCode)) == keccak256(bytes(winningCountry))) {
-                        address user = flag.owner;
-                        uint256 userFlags = countryUserCounts[winningCountry][user];
-                        if (userFlags > maxUserFlags) {
-                            maxUserFlags = userFlags;
-                            winnerAddress = user;
-                        }
+        // Trouver l'adresse gagnante dans le pays gagnant
+        uint256 maxUserFlags = 0;
+        address winnerAddress;
+        
+        for (uint i = 0; i < cryptoNames.length; i++) {
+            Flag[] storage currentFlags = cryptoFlags[cryptoNames[i]];
+            for (uint j = 0; j < currentFlags.length; j++) {
+                if (currentFlags[j].isAssigned && 
+                    keccak256(bytes(currentFlags[j].countryCode)) == keccak256(bytes(winningCountry))) {
+                    address user = currentFlags[j].owner;
+                    if (countryUserCounts[winningCountry][user] > maxUserFlags) {
+                        maxUserFlags = countryUserCounts[winningCountry][user];
+                        winnerAddress = user;
                     }
                 }
             }
@@ -215,52 +225,34 @@ contract FlagManager {
                     isAssigned: false,
                     lastUpdateTime: 0
                 });
+                delete countryCounts[cryptoNames[i]];
+                delete countryUserCounts[cryptoNames[i]][flags[cryptoNames[i]][j].owner];
             }
         }
 
-        // Réinitialiser les compteurs
-        for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
-            for (uint j = 0; j < flagCount; j++) {
-                if (flags[cryptoNames[i]][j].isAssigned) {
-                    delete countryCounts[flags[cryptoNames[i]][j].countryCode];
-                    delete countryUserCounts[flags[cryptoNames[i]][j].countryCode][flags[cryptoNames[i]][j].owner];
-                }
-            }
-        }
-
-        lastGameEndTime = block.timestamp;
+        gameEnded = true;
         emit GameEnded(winningCountry, winnerAddress, maxFlags);
     }
 
     function claimPrize() external {
+        require(gameEnded, "Game not ended yet");
         require(msg.sender == winner.winnerAddress, "Not the winner");
         require(!winner.hasClaimed, "Prize already claimed");
 
-        // Sauvegarder les infos pour l'event
-        address winnerAddress = winner.winnerAddress;
+        winner.hasClaimed = true;
         uint256 prizeAmount = address(this).balance;
-
-        // Réinitialiser le winner avant le transfert pour éviter les reentrancy attacks
-        winner = Winner({
-            countryCode: "",
-            winnerAddress: address(0),
-            flagCount: 0,
-            hasClaimed: false
-        });
-
-        // Transfert du prix
-        (bool success, ) = winnerAddress.call{value: prizeAmount}("");
+        (bool success, ) = msg.sender.call{value: prizeAmount}("");
         require(success, "Transfer failed");
 
-        emit PrizeClaimed(winnerAddress, prizeAmount);
+        emit PrizeClaimed(msg.sender, prizeAmount);
     }
 
     function getWinner() external view returns (Winner memory) {
+        require(gameEnded, "Game not ended yet");
         return winner;
     }
 
     function getVersion() external pure returns (string memory) {
-        return "1.0.0";
+        return "2.0.0";
     }
 } 

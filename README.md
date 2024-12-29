@@ -1,3 +1,15 @@
+# Flag Manager - Smart Contract Game
+
+Un jeu de drapeaux sur la blockchain Fantom où les joueurs peuvent assigner des drapeaux à différentes cryptomonnaies.
+
+## Déploiement
+
+### Prérequis
+- Node.js v16+
+- npm ou yarn
+- Un compte Fantom Testnet avec des FTM de test
+- Créer un fichier `.env` avec les variables suivantes :
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

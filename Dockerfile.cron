@@ -1,0 +1,28 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copier les fichiers nécessaires
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY hardhat.config.ts ./
+COPY scripts/endGameCron.ts ./scripts/
+COPY artifacts/ ./artifacts/
+
+# Installer les dépendances
+RUN npm install
+
+# Installer crond
+RUN apk add --no-cache dcron
+
+# Créer le script de démarrage
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'mkdir -p /var/log' >> /start.sh && \
+    echo 'touch /var/log/cron.log' >> /start.sh && \
+    echo 'echo "* * * * * cd /app && (date && node -r ts-node/register scripts/endGameCron.ts 2>&1 | tee -a /var/log/cron.log && echo \"-------------------\" | tee -a /var/log/cron.log)" > /etc/crontabs/root' >> /start.sh && \
+    echo 'chmod 600 /etc/crontabs/root' >> /start.sh && \
+    echo 'crond -f -d 8 & tail -f /var/log/cron.log' >> /start.sh && \
+    chmod +x /start.sh
+
+# Démarrer avec le script
+CMD ["/start.sh"] 

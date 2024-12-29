@@ -18,7 +18,7 @@ const NETWORK = {
   blockExplorerUrls: ['https://testnet.ftmscan.com/']
 }
 
-const CONTRACT_ADDRESS = "0x6F42DC1CFd6D9904084349066E4948129eAb175a"
+const CONTRACT_ADDRESS =  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const ABI = [
   "function getCryptoFlags(string) public view returns (tuple(bool isAssigned, string countryCode)[])"
 ]

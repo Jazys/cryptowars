@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "hardhat test",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.ts --network base"
+    "deploy": "hardhat run scripts/deploy.ts --network base",
+    "cron:end-game": "ts-node scripts/endGameCron.ts"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
@@ -28,7 +29,8 @@
     "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.2",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.3",

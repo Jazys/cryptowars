@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import FlagManagerABI from "../../artifacts/contracts/FlagManager.sol/FlagManager.json";
 
-const CONTRACT_ADDRESS = "0x6F42DC1CFd6D9904084349066E4948129eAb175a"
+const CONTRACT_ADDRESS =  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || ""
 
 export function useContract() {
   const [contract, setContract] = useState<ethers.Contract | null>(null)
@@ -63,7 +63,7 @@ export function useContract() {
       const price = await contractInstance.assignmentPrice()
       
       // Récupérer le propriétaire
-      const owner = await contractInstance.owner()
+      const owner = "";
 
       const info = {
         flagCounts,
@@ -72,6 +72,10 @@ export function useContract() {
       }
       
       setContractInfo(info)
+
+
+      const versionContract = await contractInstance.getVersion();
+      console.log("\nCurrent version:", versionContract);
       return info
     } catch (error) {
       console.error("Erreur lors de la vérification du contrat:", error)

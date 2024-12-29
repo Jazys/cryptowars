@@ -2,7 +2,7 @@ const { ethers, upgrades  } = require("hardhat");
 
 async function main() {
   // Adresse du contrat déployé
-  const contractAddress = "0x6F42DC1CFd6D9904084349066E4948129eAb175a";
+  const contractAddress =  process.env.CONTRACT_ADDRESS;
 
   console.log("Vérification du contrat FlagManager...");
   
