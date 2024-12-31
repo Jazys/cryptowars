@@ -1,17 +1,44 @@
 "use client"
 
+import { useSearchParams } from 'next/navigation'
 import Game from '../components/Game'
-import Countdown from '../components/Countdown'
-import ClaimButton from '../components/ClaimButton'
+import { useEffect, useState } from 'react'
 
 export default function GamePage() {
+  const searchParams = useSearchParams()
+  const [isValid, setIsValid] = useState(false)
+
+  useEffect(() => {
+    const network = searchParams.get('network')
+    const rpc = searchParams.get('rpc')
+    const contract = searchParams.get('contract')
+
+    if (network && rpc && contract) {
+      // Stocker les paramètres dans le localStorage pour une utilisation ultérieure
+      localStorage.setItem('selectedNetwork', JSON.stringify({
+        chainId: network,
+        rpc,
+        contractAddress: contract
+      }))
+      setIsValid(true)
+    }
+  }, [searchParams])
+
+  if (!isValid) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white">Invalid network parameters</p>
+      </div>
+    )
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4">
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <Countdown />
-      </div>
-      <Game flagsPerCrypto={12} />
-      <ClaimButton />
+      <Game params={{
+        network: undefined,
+        rpc: undefined,
+        contract: undefined
+      }} />
     </main>
   )
 } 

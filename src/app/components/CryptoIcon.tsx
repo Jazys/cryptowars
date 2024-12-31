@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { AVAILABLE_CRYPTOS } from './Game'
 
 interface CryptoIconProps {
   name: string
@@ -7,16 +7,18 @@ interface CryptoIconProps {
   size?: number
 }
 
-const cryptoToSymbol: Record<string, string> = {
-  'Bitcoin': 'btc',
-  'Ethereum': 'eth',
-  'Fantom': 'ftm'
-}
-
 export default function CryptoIcon({ name, onClick, representativeFlag, size = 40 }: CryptoIconProps) {
-  const symbol = cryptoToSymbol[name] || name.toLowerCase()
-  const iconUrl = `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${symbol}.png`
+  const crypto = AVAILABLE_CRYPTOS.find(c => c.name === name)
   
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = e.target as HTMLImageElement
+    if (crypto && img.src !== crypto.fallbackIcon) {
+      img.src = crypto.fallbackIcon
+    }
+  }
+
+  if (!crypto) return null
+
   return (
     <div className="relative cursor-pointer group">
       {representativeFlag && (
@@ -39,8 +41,9 @@ export default function CryptoIcon({ name, onClick, representativeFlag, size = 4
       >
         <div className="relative w-[40px] h-[40px]">
           <img
-            src={iconUrl}
+            src={crypto.primaryIcon}
             alt={name}
+            onError={handleImageError}
             className="w-full h-full object-contain rounded-full"
           />
         </div>

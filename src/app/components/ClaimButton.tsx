@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { useContract } from '@/hooks/useContract'
 import { ethers } from 'ethers'
@@ -8,39 +8,59 @@ import { ethers } from 'ethers'
 export default function ClaimButton() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [canClaim, setCanClaim] = useState(false)
   const { contract } = useContract()
 
+  useEffect(() => {
+    const checkCanClaim = async () => {
+      if (!contract) return;
+      
+      try {
+        const winner = await contract.getWinner();
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        const currentAddress = accounts[0];
+        
+        setCanClaim(
+          winner && 
+          winner.winnerAddress && 
+          winner.winnerAddress.toLowerCase() === currentAddress.toLowerCase() && 
+          !winner.hasClaimed
+        );
+      } catch (err) {
+        console.error("Error checking claim status:", err);
+        setCanClaim(false);
+      }
+    };
+
+    checkCanClaim();
+  }, [contract]);
+
   const handleClaim = async () => {
-    if (!contract) return
+    if (!contract || !canClaim) return;
     
     try {
-      setIsLoading(true)
-      setError('')
+      setIsLoading(true);
+      setError('');
 
-      const tx = await contract.claimPrize()
-      await tx.wait()
+      const tx = await contract.claimPrize();
+      await tx.wait();
 
-      // Afficher un message de succès
-      alert("Prix réclamé avec succès !")
+      setCanClaim(false);
+      alert("Prix réclamé avec succès !");
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="absolute bottom-4 right-4 z-50">
-      <Button 
-        onClick={handleClaim}
-        disabled={isLoading}
-        className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700"
-      >
-        {isLoading ? "Claiming..." : "Claim price"}
-      </Button>
-      {error && (
-        <p className="text-sm text-red-500 mt-2">{error}</p>
-      )}
-    </div>
-  )
+    <Button 
+      onClick={handleClaim}
+      disabled={!canClaim || isLoading}
+      className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded-r-lg rounded-l-none transition-colors"
+    >
+      {isLoading ? "Claiming..." : "Claim price"}
+    </Button>
+  );
 } 

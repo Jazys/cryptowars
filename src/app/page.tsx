@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from "@/components/ui/button"
+import NetworkSelector from './components/NetworkSelector'
 
 export default function Home() {
   return (
@@ -20,13 +21,7 @@ export default function Home() {
           />
         </div>
 
-        <Link href="/game">
-          <Button 
-            className="px-8 py-4 text-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold rounded-full transform transition hover:scale-105"
-          >
-            Play Now
-          </Button>
-        </Link>
+        <NetworkSelector />
       </div>
     </main>
   )

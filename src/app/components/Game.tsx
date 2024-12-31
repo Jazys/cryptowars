@@ -10,7 +10,9 @@ import FlagGrid from './FlagGrid'
 import DominantCountry from './DominantCountry'
 import WalletConnect from './WalletConnect'
 import { useContract } from '@/hooks/useContract'
-import { toast } from 'react-hot-toast'
+import WinnerInfo from './WinnerInfo'
+import ClaimButton from './ClaimButton'
+import { cryptoIcons, networkIcons } from '@/lib/iconMapping'
 
 const cryptoLocations = [
   { id: 'Bitcoin', name: 'Bitcoin', x: 25, y: 30, flagCount: 10 },
@@ -47,10 +49,68 @@ const TRANSACTION_AMOUNT = "0.1" // Montant en FTM
 
 console.log("RECIPIENT_ADDRESS", RECIPIENT_ADDRESS);
 interface GameProps {
-  flagsPerCrypto?: number
+  params: {
+    network?: string;
+    rpc?: string;
+    contract?: string;
+  }
 }
 
-export default function Game({ flagsPerCrypto = 12 }: GameProps) {
+// Configuration centralisée des cryptos disponibles dans le jeu
+export const AVAILABLE_CRYPTOS = [
+  {
+    name: 'Bitcoin',
+    symbol: 'BTC',
+    primaryIcon: cryptoIcons.bitcoin.primary,
+    fallbackIcon: cryptoIcons.bitcoin.fallback,
+  },
+  {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    primaryIcon: cryptoIcons.ethereum.primary,
+    fallbackIcon: cryptoIcons.ethereum.fallback,
+  },
+  {
+    name: 'Fantom',
+    symbol: 'FTM',
+    primaryIcon: cryptoIcons.fantom.primary,
+    fallbackIcon: cryptoIcons.fantom.fallback,
+  }
+]
+
+// Configuration des réseaux disponibles
+export const NETWORKS = [
+  {
+    name: 'Fantom Testnet',
+    chainId: '0xfa2',
+    rpc: 'https://rpc.testnet.fantom.network/',
+    contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+    icon: networkIcons.fantom
+  },
+  {
+    name: 'Base Testnet',
+    chainId: '0x14a33',
+    rpc: 'https://goerli.base.org',
+    contractAddress: process.env.NEXT_PUBLIC_BASE_TESTNET_CONTRACT,
+    icon: networkIcons.base
+  },
+  {
+    name: 'Base Mainnet',
+    chainId: '0x2105',
+    rpc: 'https://mainnet.base.org',
+    contractAddress: process.env.NEXT_PUBLIC_BASE_MAINNET_CONTRACT,
+    icon: networkIcons.base
+  },
+  {
+    name: 'Sonic Testnet',
+    chainId: '0xdede',
+    rpc: 'https://rpc.blaze.soniclabs.com',
+    contractAddress: process.env.NEXT_PUBLIC_SONIC_TESTNET_CONTRACT,
+    icon: networkIcons.sonic
+  }
+]
+
+export default function Game({ params }: GameProps) {
   const [placedFlags, setPlacedFlags] = useState<Record<string, string[]>>({})
   const [selectedFlag, setSelectedFlag] = useState('')
   const [expandedCrypto, setExpandedCrypto] = useState<string | null>(null)
@@ -402,6 +462,10 @@ export default function Game({ flagsPerCrypto = 12 }: GameProps) {
           </div>
         );
       })}
+      <div className="absolute bottom-4 right-4 flex items-center">
+        <WinnerInfo />
+        <ClaimButton />
+      </div>
     </Card>
   )
 }

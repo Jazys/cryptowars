@@ -22,7 +22,7 @@ async function endGame() {
         const provider = new ethers.providers.JsonRpcProvider('https://rpc.testnet.fantom.network/');
         
         // Utiliser la clé privée depuis les variables d'environnement
-        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || 'c00987121a87f28fa21fa86c160b70a62399f9c4d8a44fe5f1e6ac70008d1069', provider);
+        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || '', provider);
         
         // Connexion au contrat
         const contract = new ethers.Contract(

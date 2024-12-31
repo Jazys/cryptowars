@@ -48,6 +48,11 @@ const config = {
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
       chainId: 4002
     },
+    sonicTestnet: {
+      url: "https://rpc.blaze.soniclabs.com",
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
+      chainId: 57054
+    },
   },
   paths: {
     sources: "./contracts",

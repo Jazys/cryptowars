@@ -4,23 +4,11 @@ import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import Countdown from './Countdown'
+import { useSearchParams } from 'next/navigation'
 
-const NETWORK = {
-  chainId: '0xfa2',
-  chainName: 'Fantom Testnet',
-  nativeCurrency: {
-    name: 'Fantom',
-    symbol: 'FTM',
-    decimals: 18
-  },
-  rpcUrls: ['https://rpc.testnet.fantom.network/'],
-  blockExplorerUrls: ['https://testnet.ftmscan.com/']
-}
-
-const CONTRACT_ADDRESS =  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const ABI = [
-  "function getCryptoFlags(string) public view returns (tuple(bool isAssigned, string countryCode)[])"
+  "function getCryptoFlags(string) public view returns (tuple(bool isAssigned, string countryCode)[])",
+  "function getWinner() external view returns (tuple(string countryCode, address winnerAddress, uint256 flagCount, bool hasClaimed))"
 ]
 
 export default function WalletConnect() {
@@ -28,37 +16,37 @@ export default function WalletConnect() {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
   const [error, setError] = useState('')
 
-  // Vérifier la connexion au chargement
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (!window.ethereum) return;
+  const searchParams = useSearchParams()
+  const networkId = searchParams.get('network')
+  const rpcUrl = searchParams.get('rpc')
 
-      try {
-        // Vérifier si une adresse est stockée
-        const savedAddress = localStorage.getItem('walletAddress')
-        if (savedAddress) {
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' })
-          // Vérifier si l'adresse stockée est toujours connectée
-          if (accounts.includes(savedAddress)) {
-            const web3Provider = new ethers.providers.Web3Provider(window.ethereum)
-            const network = await web3Provider.getNetwork()
-            
-            if (network.chainId === parseInt(NETWORK.chainId, 16)) {
-              setProvider(web3Provider)
-              setAddress(savedAddress)
-            }
-          } else {
-            localStorage.removeItem('walletAddress')
+  const checkConnection = async () => {
+    if (!window.ethereum || !networkId) return;
+
+    try {
+      const savedAddress = localStorage.getItem('walletAddress')
+      if (savedAddress) {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+        if (accounts.includes(savedAddress)) {
+          const web3Provider = new ethers.providers.Web3Provider(window.ethereum)
+          const network = await web3Provider.getNetwork()
+          
+          if (network.chainId === parseInt(networkId, 16)) {
+            setProvider(web3Provider)
+            setAddress(savedAddress)
           }
+        } else {
+          localStorage.removeItem('walletAddress')
         }
-      } catch (error) {
-        console.error("Erreur lors de la vérification de la connexion:", error)
       }
+    } catch (error) {
+      console.error("Erreur lors de la vérification de la connexion:", error)
     }
+  }
 
+  useEffect(() => {
     checkConnection()
 
-    // Écouteurs d'événements
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', (accounts: string[]) => {
         if (accounts.length === 0) {
@@ -81,7 +69,7 @@ export default function WalletConnect() {
         window.ethereum.removeAllListeners()
       }
     }
-  }, [])
+  }, [networkId])
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -95,12 +83,21 @@ export default function WalletConnect() {
       
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: NETWORK.chainId }],
+        params: [{ chainId: networkId }],
       }).catch(async (switchError: any) => {
         if (switchError.code === 4902) {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [NETWORK],
+            params: [{
+              chainId: networkId,
+              rpcUrls: [rpcUrl],
+              chainName: 'Custom Network',
+              nativeCurrency: {
+                name: 'Native Token',
+                symbol: 'ETH',
+                decimals: 18
+              }
+            }],
           })
         }
       })
