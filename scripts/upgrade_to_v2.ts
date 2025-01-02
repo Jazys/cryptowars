@@ -1,4 +1,4 @@
-async function main() {
+async function upgradeContract() {
   const { ethers, upgrades } = require("hardhat");
   const PROXY_ADDRESS = "0x5854e3ebb827546cefBd85c544f899c9436BAC13";
 
@@ -41,7 +41,7 @@ async function main() {
   console.log("\nNew version:", newVersion);
 }
 
-main()
+upgradeContract()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

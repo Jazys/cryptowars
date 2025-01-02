@@ -3,7 +3,7 @@ const FlagManagerABI = [
   "function owner() view returns (address)",
   "function admin() view returns (address)",
   "function lastGameEndTime() view returns (uint256)",
-  "function getCryptoFlags(string) view returns (tuple(bool isAssigned, string countryCode)[])",
+  "function getCryptoFlags(string) view returns (tuple(string countryCode, address owner, bool isAssigned, uint256 lastUpdateTime)[])",
   "function getWinner() external view returns (tuple(string countryCode, address winnerAddress, uint256 flagCount, bool hasClaimed))"
 ];
 
@@ -19,14 +19,14 @@ async function endGame() {
     
     try {
         // Connexion au réseau Fantom Testnet
-        const provider = new ethers.providers.JsonRpcProvider('https://rpc.testnet.fantom.network/');
+        const provider = new ethers.providers.JsonRpcProvider('https://rpc.blaze.soniclabs.com');
         
         // Utiliser la clé privée depuis les variables d'environnement
         const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || '', provider);
         
         // Connexion au contrat
         const contract = new ethers.Contract(
-            process.env.CONTRACT_ADDRESS || '0x06caFcac0D4E188C09E8E722c31fad036C6F0353',
+            process.env.CONTRACT_ADDRESS || '0x1c2B374f9B516B57Afc916898A0637Eb8dB46353',
             FlagManagerABI,
             wallet
         );
@@ -70,17 +70,17 @@ async function endGame() {
         for (const crypto of cryptos) {
             console.log(`\nChecking flags for ${crypto}...`);
             try {
-                const flags: Flag[] = await contract.getCryptoFlags(crypto);
+                const flags = await contract.getCryptoFlags(crypto);
                 console.log(`Found ${flags.length} flags`);
                 
                 for (const flag of flags) {
                     if (flag && flag.isAssigned) {
-                        console.log(`Found assigned flag: ${flag.countryCode}`);
+                        console.log(`Found assigned flag for ${flag.countryCode} owned by ${flag.owner}`);
                         hasAssignedFlags = true;
                     }
                 }
             } catch (error) {
-                console.log(`Error checking flags for ${crypto}:`, error);
+                console.error(`Error checking flags for ${crypto}:`, error);
                 continue;
             }
         }

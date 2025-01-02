@@ -2,10 +2,9 @@
 
 import { useSearchParams } from 'next/navigation'
 import Game from '../components/Game'
-import { useEffect, useState } from 'react'
-import GuildBanner from '../components/GuildBanner'
+import { useEffect, useState, Suspense } from 'react'
 
-export default function GamePage() {
+function SearchParamsValidator() {
   const searchParams = useSearchParams()
   const [isValid, setIsValid] = useState(false)
 
@@ -34,14 +33,22 @@ export default function GamePage() {
   }
 
   return (
+    <Game params={{
+      network: searchParams.get('network') || undefined,
+      rpc: searchParams.get('rpc') || undefined ,
+      contract: searchParams.get('contract') || undefined
+    }} />
+  )
+}
+
+export default function GamePage() {
+  return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-between p-4">
-        <Game params={{
-          network: undefined,
-          rpc: undefined,
-          contract: undefined
-        }} />
+        <Suspense fallback={<p>Loading...</p>}>
+          <SearchParamsValidator />
+        </Suspense>
       </main>
     </>
   )
-} 
+}

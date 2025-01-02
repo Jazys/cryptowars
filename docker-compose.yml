@@ -37,7 +37,7 @@ services:
       driver: json-file
     environment:
       - PRIVATE_KEY=${PRIVATE_KEY}
-      - CONTRACT_ADDRESS=${NEXT_PUBLIC_CONTRACT_ADDRESS}
+      - CONTRACT_ADDRESS=${NEXT_PUBLIC_SONIC_TESTNET_CONTRACT}
     networks:
       - hosting_web
 

@@ -1,8 +1,6 @@
-async function main() {
+async function deployContract() {
   const { ethers, upgrades } = require("hardhat");
-  
-
-  
+   
   const FlagManager = await ethers.getContractFactory("FlagManager");
   console.log("Deploying FlagManager...");
 
@@ -45,7 +43,7 @@ async function main() {
   console.log("\nContract version:", version);
 }
 
-main()
+deployContract()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
