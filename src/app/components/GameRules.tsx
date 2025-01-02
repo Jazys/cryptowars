@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
 import { translations } from '@/lib/i18n'
 import { motion } from 'framer-motion'
-import { Flag, Coins, Trophy, ChevronRight } from 'lucide-react'
+import { Flag, Coins, Trophy, ChevronRight, Lightbulb } from 'lucide-react'
 
 interface GameRulesProps {
   networkParams: {
@@ -105,6 +105,26 @@ export default function GameRules({ networkParams, onClose }: GameRulesProps) {
                 {t.rewards.title}
               </h3>
               <p className="mt-1 text-lg text-gray-700">{t.rewards.description}</p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-blue-500/10"
+            >
+              <h3 className="text-xl font-semibold flex items-center gap-2 text-green-700">
+                <Lightbulb className="w-6 h-6" />
+                {t.upcomingFeatures.title}
+              </h3>
+              <ul className="mt-2 space-y-1">
+                {t.upcomingFeatures.items.map((item, index) => (
+                  <li key={index} className="flex items-center gap-3 text-lg text-gray-700">
+                    <ChevronRight className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </motion.div>
           </div>
 

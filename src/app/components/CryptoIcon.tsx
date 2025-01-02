@@ -9,7 +9,7 @@ interface CryptoIconProps {
 
 export default function CryptoIcon({ name, onClick, representativeFlag, size = 40 }: CryptoIconProps) {
   const crypto = AVAILABLE_CRYPTOS.find(c => c.name === name)
-  
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const img = e.target as HTMLImageElement
     if (crypto && img.src !== crypto.fallbackIcon) {

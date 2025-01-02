@@ -17,6 +17,10 @@ type Translations = {
       back: string;
       letsGo: string;
     };
+    upcomingFeatures: {
+      title: string;
+      items: string[];
+    };
   };
 };
 
@@ -43,6 +47,14 @@ export const translations: Translations = {
     buttons: {
       back: "Retour",
       letsGo: "C'est parti !"
+    },
+    upcomingFeatures: {
+      title: "Fonctionnalités à venir",
+      items: [
+        "Création et gestion de guildes",
+        "Rejoindre et collaborer avec des guildes",
+        "Nouveaux défis et récompenses"
+      ]
     }
   },
   en: {
@@ -67,6 +79,14 @@ export const translations: Translations = {
     buttons: {
       back: "Back",
       letsGo: "Let's Go!"
+    },
+    upcomingFeatures: {
+      title: "Upcoming Features",
+      items: [
+        "Guild creation and management",
+        "Join and collaborate with guilds",
+        "New challenges and rewards"
+      ]
     }
   }
 }; 

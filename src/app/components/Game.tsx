@@ -13,6 +13,7 @@ import { useContract } from '@/hooks/useContract'
 import WinnerInfo from './WinnerInfo'
 import ClaimButton from './ClaimButton'
 import { cryptoIcons, networkIcons } from '@/lib/iconMapping'
+import GuildBanner from './GuildBanner'
 
 const cryptoLocations = [
   { id: 'Bitcoin', name: 'Bitcoin', x: 25, y: 30, flagCount: 10 },
@@ -85,28 +86,32 @@ export const NETWORKS = [
     chainId: '0xfa2',
     rpc: 'https://rpc.testnet.fantom.network/',
     contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-    icon: networkIcons.fantom
+    icon: networkIcons.fantom,
+    available: false,
   },
   {
     name: 'Base Testnet',
     chainId: '0x14a33',
     rpc: 'https://goerli.base.org',
     contractAddress: process.env.NEXT_PUBLIC_BASE_TESTNET_CONTRACT,
-    icon: networkIcons.base
+    icon: networkIcons.base,
+    available: false,
   },
   {
     name: 'Base Mainnet',
     chainId: '0x2105',
     rpc: 'https://mainnet.base.org',
     contractAddress: process.env.NEXT_PUBLIC_BASE_MAINNET_CONTRACT,
-    icon: networkIcons.base
+    icon: networkIcons.base,
+    available: false,
   },
   {
     name: 'Sonic Testnet',
     chainId: '0xdede',
     rpc: 'https://rpc.blaze.soniclabs.com',
     contractAddress: process.env.NEXT_PUBLIC_SONIC_TESTNET_CONTRACT,
-    icon: networkIcons.sonic
+    icon: networkIcons.sonic,
+    available: true,
   }
 ]
 
@@ -379,8 +384,9 @@ export default function Game({ params }: GameProps) {
     <Card className="relative w-full h-[calc(100vh-2rem)] overflow-hidden">
       <MapCrypto />
       <div className="absolute top-4 right-4 z-10 flex gap-4">
-        <DominantCountry country={dominantCountry} />
+        <DominantCountry country={dominantCountry} />       
         <WalletConnect />
+        <GuildBanner />
       </div>
       
      {/* {renderContractInfo()} */}

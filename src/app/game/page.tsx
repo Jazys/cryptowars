@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 import Game from '../components/Game'
 import { useEffect, useState } from 'react'
+import GuildBanner from '../components/GuildBanner'
 
 export default function GamePage() {
   const searchParams = useSearchParams()
@@ -33,12 +34,14 @@ export default function GamePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-4">
-      <Game params={{
-        network: undefined,
-        rpc: undefined,
-        contract: undefined
-      }} />
-    </main>
+    <>
+      <main className="flex min-h-screen flex-col items-center justify-between p-4">
+        <Game params={{
+          network: undefined,
+          rpc: undefined,
+          contract: undefined
+        }} />
+      </main>
+    </>
   )
 } 

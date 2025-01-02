@@ -14,11 +14,13 @@ interface Network {
   rpc: string;
   contractAddress: string | undefined;
   icon: string;
+  available: boolean;
 }
 
 export default function NetworkSelector() {
   const [selectedNetwork, setSelectedNetwork] = useState('')
   const [showRules, setShowRules] = useState(false)
+  const [showComingSoon, setShowComingSoon] = useState(false)
   const router = useRouter()
 
   const handlePlay = () => {
@@ -50,22 +52,40 @@ export default function NetworkSelector() {
         <div className="space-y-4">
           <Select
             value={selectedNetwork}
-            onValueChange={setSelectedNetwork}
+            onValueChange={(value) => {
+              const network = NETWORKS.find(n => n.name === value);
+              if (network?.available) {
+                setSelectedNetwork(value);
+              } else {
+                setShowComingSoon(true);
+              }
+            }}
           >
             <SelectTrigger className="w-full bg-white/90 backdrop-blur-sm">
               <SelectValue placeholder="Choose a network" />
             </SelectTrigger>
             <SelectContent>
               {NETWORKS.map((network) => (
-                <SelectItem key={network.chainId} value={network.name}>
+                <SelectItem 
+                  key={network.chainId} 
+                  value={network.name}
+                  disabled={!network.available}
+                  className={!network.available ? 
+                    'opacity-50 cursor-not-allowed bg-gray-100' : 
+                    'cursor-pointer'
+                  }
+                >
                   <div className="flex items-center gap-2">
                     <img
                       src={network.icon}
                       alt={network.name}
-                      className="w-6 h-6"
+                      className={`w-6 h-6 ${!network.available ? 'grayscale' : ''}`}
                       loading="lazy"
                     />
-                    <span>{network.name}</span>
+                    <span className={!network.available ? 'text-gray-400' : ''}>
+                      {network.name}
+                      {!network.available && ' (Coming soon)'}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
