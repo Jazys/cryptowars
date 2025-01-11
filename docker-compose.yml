@@ -13,7 +13,7 @@ services:
       driver: json-file
     labels:
       - traefik.enable=true
-      - traefik.http.routers.crypto-wars.rule=Host(`crypto-wars.prod-n8n.omvpb.ovh`)
+      - traefik.http.routers.crypto-wars.rule=Host(`crypto-battles.xyz`)
       - traefik.http.routers.crypto-wars.entrypoints=websecure
       - traefik.http.routers.crypto-wars.tls=true
       - traefik.http.routers.crypto-wars.tls.certresolver=lets-encrypt
