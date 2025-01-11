@@ -18,8 +18,9 @@ async function deployContract() {
   const initialCryptos = [
     { name: "Bitcoin", flagCount: 10 },
     { name: "Ethereum", flagCount: 8 },
-    { name: "Fantom", flagCount: 5 }
+    { name: "Bera", flagCount: 15 }
   ];
+  const cryptos = ['Bitcoin', 'Ethereum', 'Bera'];
 
   for (const crypto of initialCryptos) {
     const tx = await proxy.addCrypto(crypto.name, crypto.flagCount);
@@ -27,7 +28,6 @@ async function deployContract() {
     console.log(`Crypto ${crypto.name} ajoutée avec ${crypto.flagCount} drapeaux`);
   }
 
-  const cryptos = ['Bitcoin', 'Ethereum', 'Fantom'];
   console.log("\nVérification des cryptos après upgrade:");
   for (const crypto of cryptos) {
     const count = await proxy.getCryptoFlagCount(crypto);
