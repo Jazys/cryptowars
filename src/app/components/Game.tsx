@@ -36,6 +36,14 @@ export const AVAILABLE_CRYPTOS = AVAILABLE_CRYPTOS_CFG;
 // Configuration des réseaux disponibles
 export const NETWORKS = NETWORKS_CFG;
 
+interface CryptoInfo {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  flagCount: number;
+}
+
 export default function Game({ params }: GameProps) {
   const [placedFlags, setPlacedFlags] = useState<Record<string, string[]>>({})
   const [selectedFlag, setSelectedFlag] = useState('')
@@ -45,12 +53,19 @@ export default function Game({ params }: GameProps) {
   const [browserLanguage, setBrowserLanguage] = useState('')
   const [transactionPending, setTransactionPending] = useState(false)
   const [transactionError, setTransactionError] = useState<string>('')
-  const { assignFlag, getCryptoFlags, isReady, contractInfo } = useContract()
+  const { 
+    assignFlag, 
+    getCryptoFlags, 
+    isReady, 
+    contractInfo,
+    contract
+  } = useContract()
   const [contractFlags, setContractFlags] = useState<Record<string, any[]>>({})
   const [isLoading, setIsLoading] = useState(false)
   const loadingRef = useRef(false)
   const [lastUpdate, setLastUpdate] = useState<number>(0)
   const REFRESH_INTERVAL = 10000 // 10 secondes en millisecondes
+  const [availableCryptos, setAvailableCryptos] = useState<CryptoInfo[]>([])
 
   useEffect(() => {
     const lang = navigator.language.toLowerCase()
@@ -61,6 +76,40 @@ export default function Game({ params }: GameProps) {
       setSelectedFlag(matchingFlag.code)
     }
   }, [])
+
+  // Fonction pour charger les cryptos disponibles depuis le contrat
+  const loadAvailableCryptos = useCallback(async () => {
+    if (!isReady || !contract) return;
+    try {
+      // Récupérer directement toutes les cryptos via getCryptoFlagCount
+      const cryptos: CryptoInfo[] = [];
+      
+      for (const configCrypto of cryptoLocations) {
+        try {
+          const count = await contract.getCryptoFlagCount(configCrypto.name);
+          cryptos.push({
+            id: configCrypto.name,
+            name: configCrypto.name,
+            flagCount: count.toNumber(),
+            x: configCrypto.x,
+            y: configCrypto.y
+          });
+        } catch (err) {
+          console.log(`Crypto ${configCrypto.name} non disponible dans le contrat`);
+        }
+      }
+
+      console.log("Cryptos disponibles:", cryptos);
+      setAvailableCryptos(cryptos);
+    } catch (error) {
+      console.error("Erreur lors du chargement des cryptos:", error);
+    }
+  }, [isReady, contract]);
+
+  // Charger les cryptos disponibles au démarrage
+  useEffect(() => {
+    loadAvailableCryptos();
+  }, [loadAvailableCryptos]);
 
   const loadFlags = useCallback(async () => {
     // Vérifier si assez de temps s'est écoulé depuis la dernière mise à jour
@@ -77,7 +126,7 @@ export default function Game({ params }: GameProps) {
     try {
       const flags: Record<string, any[]> = {};
       
-      for (const crypto of cryptoLocations) {
+      for (const crypto of availableCryptos) {
         try {
           const cryptoFlags = await getCryptoFlags(crypto.id);
           flags[crypto.id] = cryptoFlags;
@@ -103,7 +152,7 @@ export default function Game({ params }: GameProps) {
       setIsLoading(false);
       loadingRef.current = false;
     }
-  }, [isReady, getCryptoFlags, lastUpdate, REFRESH_INTERVAL]);
+  }, [isReady, getCryptoFlags, lastUpdate, REFRESH_INTERVAL, availableCryptos]);
 
   // Chargement initial
   useEffect(() => {
@@ -355,7 +404,7 @@ export default function Game({ params }: GameProps) {
           ))}
         </SelectContent>
       </Select>
-      {cryptoLocations.map(crypto => {
+      {availableCryptos.map(crypto => {
         const cryptoFlags = placedFlags[crypto.id] || [];
         const contractCryptoFlags = contractFlags[crypto.id] || [];
         const representativeFlag = getRepresentativeFlagForCrypto(crypto.id);

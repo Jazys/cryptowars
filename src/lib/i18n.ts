@@ -26,7 +26,7 @@ type Translations = {
 
 export const translations: Translations = {
   fr: {
-    title: "Comment jouer à Crypto Wars",
+    title: "Comment jouer à Crypto Battles",
     objective: {
       title: "🎯 Objectif",
       description: "Placez vos drapeaux stratégiquement pour dominer les cryptomonnaies !"
@@ -58,7 +58,7 @@ export const translations: Translations = {
     }
   },
   en: {
-    title: "How to Play Crypto Wars",
+    title: "How to Play Crypto Battles",
     objective: {
       title: "🎯 Objective",
       description: "Place your flags strategically to dominate cryptocurrencies!"
