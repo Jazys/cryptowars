@@ -140,13 +140,15 @@ contract FlagManager {
     }
 
     function endGame() external onlyAdmin {
-        string[3] memory cryptoNames = ["Bitcoin", "Ethereum", "Fantom"];
+        uint256 cryptoCount = cryptos.length;
         
         // Compter les drapeaux par pays et par utilisateur
-        for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
+        for (uint i = 0; i < cryptoCount; i++) {
+            string memory cryptoName = cryptos[i].name;
+            uint256 flagCount = cryptos[i].flagCount;
+            
             for (uint j = 0; j < flagCount; j++) {
-                Flag storage flag = flags[cryptoNames[i]][j];
+                Flag storage flag = flags[cryptoName][j];
                 if (flag.isAssigned) {
                     string memory country = flag.countryCode;
                     address user = flag.owner;
@@ -163,10 +165,12 @@ contract FlagManager {
         uint256 maxUserFlags = 0;
         
         // D'abord trouver le pays avec le plus de drapeaux
-        for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
+        for (uint i = 0; i < cryptoCount; i++) {
+            string memory cryptoName = cryptos[i].name;
+            uint256 flagCount = cryptos[i].flagCount;
+            
             for (uint j = 0; j < flagCount; j++) {
-                Flag storage flag = flags[cryptoNames[i]][j];
+                Flag storage flag = flags[cryptoName][j];
                 if (flag.isAssigned) {
                     string memory country = flag.countryCode;
                     if (countryCounts[country] > maxFlags) {
@@ -180,10 +184,12 @@ contract FlagManager {
         // Si on a trouvé un pays gagnant, trouver le joueur avec le plus de drapeaux dans ce pays
         if (maxFlags > 0) {
             // Parcourir tous les drapeaux pour trouver le joueur avec le plus de drapeaux dans le pays gagnant
-            for (uint i = 0; i < cryptoNames.length; i++) {
-                uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
+            for (uint i = 0; i < cryptoCount; i++) {
+                string memory cryptoName = cryptos[i].name;
+                uint256 flagCount = cryptos[i].flagCount;
+                
                 for (uint j = 0; j < flagCount; j++) {
-                    Flag storage flag = flags[cryptoNames[i]][j];
+                    Flag storage flag = flags[cryptoName][j];
                     if (flag.isAssigned && 
                         keccak256(bytes(flag.countryCode)) == keccak256(bytes(winningCountry))) {
                         address user = flag.owner;
@@ -206,10 +212,12 @@ contract FlagManager {
         });
 
         // Réinitialiser tous les drapeaux
-        for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
+        for (uint i = 0; i < cryptoCount; i++) {
+            string memory cryptoName = cryptos[i].name;
+            uint256 flagCount = cryptos[i].flagCount;
+            
             for (uint j = 0; j < flagCount; j++) {
-                flags[cryptoNames[i]][j] = Flag({
+                flags[cryptoName][j] = Flag({
                     countryCode: "",
                     owner: address(0),
                     isAssigned: false,
@@ -219,12 +227,14 @@ contract FlagManager {
         }
 
         // Réinitialiser les compteurs
-        for (uint i = 0; i < cryptoNames.length; i++) {
-            uint256 flagCount = getCryptoFlagCount(cryptoNames[i]);
+        for (uint i = 0; i < cryptoCount; i++) {
+            string memory cryptoName = cryptos[i].name;
+            uint256 flagCount = cryptos[i].flagCount;
+            
             for (uint j = 0; j < flagCount; j++) {
-                if (flags[cryptoNames[i]][j].isAssigned) {
-                    delete countryCounts[flags[cryptoNames[i]][j].countryCode];
-                    delete countryUserCounts[flags[cryptoNames[i]][j].countryCode][flags[cryptoNames[i]][j].owner];
+                if (flags[cryptoName][j].isAssigned) {
+                    delete countryCounts[flags[cryptoName][j].countryCode];
+                    delete countryUserCounts[flags[cryptoName][j].countryCode][flags[cryptoName][j].owner];
                 }
             }
         }
