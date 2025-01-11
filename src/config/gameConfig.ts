@@ -3,7 +3,8 @@ import { cryptoIcons, networkIcons } from '@/lib/iconMapping'
 export const cryptoLocations = [
   { id: 'Bitcoin', name: 'Bitcoin', x: 25, y: 10, flagCount: 10 },
   { id: 'Ethereum', name: 'Ethereum', x: 75, y: 30, flagCount: 8 },
-  { id: 'Fantom', name: 'Fantom', x: 50, y: 70, flagCount: 5 }
+  { id: 'Fantom', name: 'Fantom', x: 50, y: 70, flagCount: 5 },
+  { id: 'Bera', name: 'Bera', x: 50, y: 70, flagCount: 5 },
 ]
 
 export const allFlags = [
@@ -47,6 +48,12 @@ export const AVAILABLE_CRYPTOS_CFG = [
     symbol: 'FTM',
     primaryIcon: cryptoIcons.fantom.primary,
     fallbackIcon: cryptoIcons.fantom.fallback,
+  },
+  {
+    name: 'Bera',
+    symbol: 'BERA',
+    primaryIcon: cryptoIcons.bera.primary,
+    fallbackIcon: cryptoIcons.bera.fallback,
   }
 ]
 
@@ -81,6 +88,14 @@ export const NETWORKS_CFG = [
     rpc: 'https://rpc.blaze.soniclabs.com',
     contractAddress: process.env.NEXT_PUBLIC_SONIC_TESTNET_CONTRACT,
     icon: networkIcons.sonic,
+    available: true,
+  },
+  {
+    name: 'Bera Testnet',
+    chainId: '0x138d4',
+    rpc: 'https://bartio.rpc.berachain.com',
+    contractAddress: process.env.NEXT_PUBLIC_BERACHAIN_TESTNET_CONTRACT,
+    icon: networkIcons.bera,
     available: true,
   }
 ]

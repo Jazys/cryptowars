@@ -11,6 +11,10 @@ export const cryptoIcons = {
   fantom: {
     primary: 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/ftm.png',
     fallback: 'https://assets.coingecko.com/coins/images/4001/large/Fantom.png'
+  },
+  bera: {
+    primary: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/bera.png',
+    fallback: 'https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/bera.png'
   }
 }
 
@@ -19,7 +23,8 @@ const sonicBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAA
 export const networkIcons = {
   fantom: 'https://assets.coingecko.com/coins/images/4001/large/Fantom.png',
   base: 'https://icons.llamao.fi/icons/chains/rsz_base.jpg',
-  sonic: sonicBase64
+  sonic: sonicBase64,
+  bera: "https://artio-static-asset-public.s3.ap-southeast-1.amazonaws.com/assets/bera.png"
 }
 
 // Option alternative avec des icônes locales
@@ -27,11 +32,13 @@ export const localIcons = {
   crypto: {
     bitcoin: '/crypto-icons/bitcoin.png',
     ethereum: '/crypto-icons/ethereum.png',
-    fantom: '/crypto-icons/fantom.png'
+    fantom: '/crypto-icons/fantom.png',
+    bera: '/crypto-icons/bera.png'
   },
   network: {
     fantom: '/network-icons/fantom.png',
     base: '/network-icons/base.svg',
-    sonic: sonicBase64
+    sonic: sonicBase64,
+    bera: '/network-icons/bera.png'
   }
 } 

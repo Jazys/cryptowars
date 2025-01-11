@@ -21,6 +21,10 @@ export function useContract() {
   const rpcUrl = searchParams.get('rpc')
   const contractAddress = searchParams.get('contract')
 
+  console.log("networkId", networkId)
+  console.log("rpcUrl", rpcUrl)
+  console.log("contractAddress", contractAddress)
+
   useEffect(() => {
     const initContract = async () => {
       if (!window.ethereum || !networkId || !rpcUrl || !contractAddress) {
@@ -80,7 +84,14 @@ export function useContract() {
     if (!contractInstance) throw new Error("Contract not initialized")
     
     try {
-      const cryptos = ['Bitcoin', 'Ethereum', 'Fantom']
+      // Récupérer la liste des cryptos depuis le contrat
+      const cryptoCount = await contractInstance.cryptos.length;
+      const cryptos = [];
+      for (let i = 0; i < cryptoCount; i++) {
+        const crypto = await contractInstance.cryptos(i);
+        cryptos.push(crypto.name);
+      }
+      
       const flagCounts: Record<string, number> = {}
       
       // Récupérer les informations pour chaque crypto
