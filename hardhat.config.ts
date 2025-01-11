@@ -53,6 +53,11 @@ const config = {
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
       chainId: 57054
     },
+    berachainTestnet: {
+      url: "https://bartio.rpc.berachain.com",
+      accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
+      chainId: 80084
+    },
   },
   paths: {
     sources: "./contracts",
