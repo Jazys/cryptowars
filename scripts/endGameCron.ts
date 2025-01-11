@@ -4,7 +4,8 @@ const FlagManagerABI = [
   "function admin() view returns (address)",
   "function lastGameEndTime() view returns (uint256)",
   "function getCryptoFlags(string) view returns (tuple(string countryCode, address owner, bool isAssigned, uint256 lastUpdateTime)[])",
-  "function getWinner() external view returns (tuple(string countryCode, address winnerAddress, uint256 flagCount, bool hasClaimed))"
+  "function getWinner() external view returns (tuple(string countryCode, address winnerAddress, uint256 flagCount, bool hasClaimed))",
+  "function getCryptoFlagCount(string) view returns (uint256)"
 ];
 
 interface Flag {
@@ -19,17 +20,38 @@ async function endGame() {
     
     try {
         // Connexion au réseau Fantom Testnet
-        const provider = new ethers.providers.JsonRpcProvider('https://rpc.blaze.soniclabs.com');
+        const provider = new ethers.providers.JsonRpcProvider(process.env.RPC || 'https://bartio.rpc.berachain.com'); //https://bartio.rpc.berachain.com  //https://rpc.blaze.soniclabs.com
         
         // Utiliser la clé privée depuis les variables d'environnement
         const wallet = new ethers.Wallet(process.env.PRIVATE_KEY || '', provider);
         
         // Connexion au contrat
         const contract = new ethers.Contract(
-            process.env.CONTRACT_ADDRESS || '0x1c2B374f9B516B57Afc916898A0637Eb8dB46353',
+            process.env.CONTRACT_ADDRESS || '0xcA1018b35596F3Ee05DbAcEb8a594D00c1B41963',
             FlagManagerABI,
             wallet
         );
+
+        // On teste les cryptos qu'on connaît
+        const cryptosToTest = ['Bitcoin', 'Ethereum', 'Bera'];
+
+        const availableCryptos: string[] = [];
+
+        for (const crypto of cryptosToTest) {
+            try {
+                await contract.getCryptoFlagCount(crypto);
+                availableCryptos.push(crypto);
+            } catch (error) {
+                console.log(`Crypto ${crypto} not available in contract`);
+            }
+        }
+
+        if (availableCryptos.length === 0) {
+            console.log('No cryptos found in contract');
+            return;
+        }
+
+        console.log('Available cryptos:', availableCryptos);
 
         // Vérifier le code du contrat
         const code = await provider.getCode(contract.address);
@@ -64,10 +86,10 @@ async function endGame() {
         console.log('Checking game state...');
         
         // Vérifier les drapeaux assignés
-        const cryptos = ['Bitcoin', 'Ethereum', 'Fantom'];
+        
         let hasAssignedFlags = false;
         
-        for (const crypto of cryptos) {
+        for (const crypto of availableCryptos) {
             console.log(`\nChecking flags for ${crypto}...`);
             try {
                 const flags = await contract.getCryptoFlags(crypto);
