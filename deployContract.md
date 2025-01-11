@@ -83,6 +83,16 @@ Crypto Fantom ajoutée avec 5 drapeaux
 New version: 2.0.0
 ```
 
+## Ajout de nouvelle crypto
+Quand on deploie le contrats, on ajoute les cryptos que l'on veut et on vérifie bien que ces cryptos sont ajoutés
+==> donc rajouter dans le contrat les cryptos que l'on veut
+Il faut modifier le fichier gameConfig.ts dans src/config/gameConfig.ts afin de rajouter 
+- l'emplacement des crypto
+- les chain utilisées
+
+Il faut aussi modifier le fichier iconMapping.ts dans src/lib/iconMapping.ts pour rajouter les images des crypto
+Ne pas oublier de modifier le endGameCron.ts dans scripts/endGameCron.ts pour gérer les matchs
+
 ## Gestion des Parties
 
 Pour configurer la partie web :
